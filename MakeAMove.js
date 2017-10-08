@@ -4,15 +4,18 @@ var xArray =[];
 var oArray = [];
 var count = 0;
 var t;
+var pos;
 var userMoved = false;
+var conf;
 var refreshTime = 200;
 var winList = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
     [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 var corner = ['0', '2', '6', '8'];
 var edge = ['1', '3', '5', '7'];
 var subtract = [-1, 1];
-
-
+var MoveList = ['0','2','6','8','4','4','0','2','6','8','4','4','0','2','6','8','4','4','1','3','5','7'];
+var AScore = 0;
+var HScore = 0;
 
 
 function init(){
@@ -25,6 +28,7 @@ function init(){
     document.body.innerHTML = '';
     clearTimeout(t);
     createNewTable();
+    conf = confirm("DO YOU WANT TO PLAY FIRST?");
     start();
 }
 
@@ -43,6 +47,7 @@ function start(){
 
             clearTimeout(t);
             if (i < 0) {
+
                 alert("O WIN!");
             } else {
 
@@ -60,7 +65,11 @@ function start(){
     }
     // result();
 
-    MoveFirst();
+    if(!conf) {
+        MoveFirst();
+    }else {
+        MoveSecond();
+    }
     //MakeAMove();
     if(!finished) {
         t = setTimeout(start, refreshTime);
@@ -96,9 +105,55 @@ function WriteO(id){
         count = 0;
         return true;
     }
+}function WriteX(id){
+    if(document.getElementById(id).innerHTML !=''|| count !=0) {
+
+        return false;
+    }else{
+        document.getElementById(id).innerHTML = 'X';
+        xArray.push(id);
+        count = 1;
+        return true;
+    }
 }
 
+
+
 function MoveFirst(){
+    if(count == 1){
+        return;
+    }
+    if(blockX()){
+        return;
+    }
+    if (xArray.length == 0){
+
+        pos = MoveList[Math.floor(Math.random()*22)]
+        WriteX(pos);
+        return;
+    }else if(xArray.length == 1 ){
+        if(corner.indexOf(pos) != -1){
+            if(edge.indexOf(oArray[0]) != -1){
+                WriteX('4');
+                return;
+            }
+        }
+
+    }
+    while(!WriteX('' + corner[Math.floor(Math.random()*4)])){
+        if(xArray.length >= 3 && WriteX( edge[Math.floor(Math.random()*4)])){
+            break;
+        }
+    }
+
+
+
+
+}
+
+
+
+function MoveSecond(){
     if(count == 0){
         return;
     }
@@ -129,7 +184,14 @@ function MoveFirst(){
             return;
         }
     }else{
-        WriteO(edge[Math.floor(Math.random()*5)]);
+        if (corner.indexOf(xArray[1]) != -1 && corner.indexOf(xArray[0]) != -1 && oArray.length == 1) {
+            while (!WriteO('' + edge[Math.floor(Math.random() * 4)])) ;
+            return
+        }else if (edge.indexOf((xArray[0])!=-1) && xArray.length == 2){
+            WriteO('4');
+            return;
+        }
+        while(WriteO(corner[Math.floor(Math.random()*4)]));
     }
 
 
@@ -188,6 +250,45 @@ function block(){
     }
     return false;
 }
+function blockX(){
+    if(xArray.length < 2){
+        return false;
+    }
+    var C, B, index, BNeededx, BNeededY;
+    var needBlock = false;
+    for(i = 0; i < winList.length; i++) {
+        C = 0;
+        B = 0;
+        index = 0;
+        for (j = 0; j < 3; j++) {
+            if (xArray.indexOf('' + winList[i][j]) != -1) {
+                C++
+            }else if (oArray.indexOf('' + winList[i][j]) != -1) {
+                B++;
+            } else {
+                index = j;
+            }
+        }
+        if (C > 1) {
+            if (WriteX('' + winList[i][index])) {
+                return true;
+            }
+        }
+        if (B > 1 && C == 0) {
+            needBlock = true;
+            BNeededx= i;
+            BNeededY = index;
+        }
+    }
+
+    if (needBlock){
+
+        if (WriteX(''+winList[BNeededx][BNeededY])){
+                return true;
+        }
+    }
+    return false;
+}
 
 
 
@@ -214,8 +315,22 @@ function win(){
 
         }
         if(Xwin == true){
+            if(conf) {
+                HScore;
+                document.getElementById('HumanScore').innerHTML = '' + HScore;
+            }else{
+                AScore+=1;
+                document.getElementById('AIScore').innerHTML = '' + AScore;
+            }
             return 1;
         }else if(Owin == true){
+            if(!conf) {
+                HScore+=1;
+                document.getElementById('HumanScore').innerHTML = '' + HScore;
+            }else{
+                AScore+=1;
+                document.getElementById('AIScore').innerHTML = '' + AScore;
+            }
             return -1;
         }
     }
@@ -248,12 +363,12 @@ function createNewTable() {
                     count = 1;
                     xArray.push(this.id);
                 }
-                // } else {
-                //     this.innerHTML = "O";
-                //     count = 0;
-                //     oArray.push(this.id);
-                //     oArray.push(MakeAMove());
-                // }
+                else {
+                    this.innerHTML = "O";
+                    count = 0;
+                    oArray.push(this.id);
+
+                }
 
                 userMoved = true;
                 userChose.push(userChose);
@@ -265,6 +380,33 @@ function createNewTable() {
             table.appendChild(slot);
         }
     }
-
+    var ai = document.createElement("DIV");
+    ai.setAttribute("id", "AI");
+    ai.setAttribute("class", "slot");
+    ai.style.top = top + 'px';
+    ai.style.left = left  - 230 + 'px';
+    ai.innerHTML = "AI";
+    table.appendChild(ai);
+    var ais = document.createElement("DIV");
+    ais.setAttribute("id", "AIScore");
+    ais.setAttribute("class", "slot");
+    ais.style.top = top + 230 +'px';
+    ais.style.left = left  - 230 + 'px';
+    ais.innerHTML = AScore;
+    table.appendChild(ais);
+    var human = document.createElement("DIV");
+    human.setAttribute("id", "Human");
+    human.setAttribute("class", "slot");
+    human.style.top = top + 'px';
+    human.style.left = left  + 690 + 'px';
+    human.innerHTML = "P";
+    table.appendChild(human);
+    var hms = document.createElement("DIV");
+    hms.setAttribute("id", "HumanScore");
+    hms.setAttribute("class", "slot");
+    hms.style.top = top + 230 + 'px';
+    hms.style.left = left  + 690 + 'px';
+    hms.innerHTML = HScore;
+    table.appendChild(hms);
 
 }
