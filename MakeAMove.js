@@ -10,6 +10,7 @@ var winList = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
     [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 var corner = ['0', '2', '6', '8'];
 var edge = ['1', '3', '5', '7'];
+var subtract = [-1, 1];
 
 
 
@@ -25,8 +26,6 @@ function init(){
     clearTimeout(t);
     createNewTable();
     start();
-
-
 }
 
 function start(){
@@ -61,8 +60,8 @@ function start(){
     }
     // result();
 
-    //MoveFirst();
-    MakeAMove();
+    MoveFirst();
+    //MakeAMove();
     if(!finished) {
         t = setTimeout(start, refreshTime);
     }
@@ -100,6 +99,9 @@ function WriteO(id){
 }
 
 function MoveFirst(){
+    if(count == 0){
+        return;
+    }
     if(block()){
         return;
     }
@@ -107,7 +109,7 @@ function MoveFirst(){
     if (xArray.length == 1) {
         // first piece is in center
         if (xArray[0] == 4) {
-            while(!WriteO('' + corner[Math.floor(Math.random()*5)]));
+            while(!WriteO('' + corner[Math.floor(Math.random()*4)]));
             return;
         }
         // first piece is on corner
@@ -118,18 +120,16 @@ function MoveFirst(){
         }
         // first piece is on edge
         else{
+            var i = parseInt(xArray[0]);
             if(xArray[0]=='1' || xArray[0] == '7'){
-                var i = parseInt(xArray[0]);
-                while(!WriteO(''+ (i + Math.ceil(Math.random()-0.5))));
+                while(!WriteO(''+ (i + subtract[Math.floor(Math.random()*2)])));
             }else{
-                var i = parseInt(xArray[0]);
-                while(!WriteO(''+ (i + 3*Math.ceil(Math.random()-0.5))));
-
+                while(!WriteO(''+ (i + 3*subtract[Math.floor(Math.random()*2)])));
             }
-            return
+            return;
         }
     }else{
-        MakeAMove();
+        WriteO(edge[Math.floor(Math.random()*5)]);
     }
 
 
@@ -147,6 +147,7 @@ function MoveFirst(){
 
 
 }
+
 
 function block(){
     if(xArray.length < 2){
@@ -172,7 +173,7 @@ function block(){
                 return true;
             }
         }
-        if (B > 1) {
+        if (B > 1 && C == 0) {
             needBlock = true;
             BNeededx= i;
             BNeededY = index;
