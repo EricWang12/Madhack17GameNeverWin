@@ -187,11 +187,11 @@ function MoveSecond(){
         if (corner.indexOf(xArray[1]) != -1 && corner.indexOf(xArray[0]) != -1 && oArray.length == 1) {
             while (!WriteO('' + edge[Math.floor(Math.random() * 4)])) ;
             return
-        }else if (edge.indexOf(xArray[0])!=-1 && xArray.length == 2){
+        }else if (edge.indexOf((xArray[0])!=-1) && xArray.length == 2){
             WriteO('4');
             return;
         }
-        while(!WriteO(corner[Math.floor(Math.random()*4)]));
+        while(WriteO(corner[Math.floor(Math.random()*4)]));
     }
 
 
