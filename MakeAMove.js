@@ -38,9 +38,20 @@ function start(){
 
     //alert("HHH");
     if(xArray.length>=3) {
-        if (win() ) {
+        i = win();
+        if (i !=0 ) {
             clearTimeout(t);
-            alert("X WIN!");
+            if (i < 0) {
+                alert("O WIN!");
+            } else {
+
+                alert("X WIN!");
+            }
+            init();
+        }
+        if(xArray.length > 4 || oArray.length >4){
+            clearTimeout(t);
+            alert("DRAW!!!");
             init();
         }
     }
@@ -64,23 +75,33 @@ function MoveFirst(){
 }
 
 function win(){
-    if(xArray.length < 3){
+    if(xArray.length < 3 && oArray.length < 3){
         return;
     }
     for(i = 0; i < winList.length; i++){
-        var win = true;
-        for(j = 0; j < 3; j++){
-            if(xArray.indexOf(''+winList[i][j]) == -1){
-                win = false;
+        var Xwin = true;
+        var Owin = true;
+        for(j = 0; j < 3; j++) {
+            if (xArray.indexOf('' + winList[i][j]) == -1) {
+                Xwin = false;
+                break;
+
+            }
+        }
+        for(j = 0; j < 3; j++) {
+            if(oArray.indexOf(''+winList[i][j]) == -1){
+                Owin = false;
                 break;
             }
 
         }
-        if(win == true){
-            return win;
+        if(Xwin == true){
+            return 1;
+        }else if(Owin == true){
+            return -1;
         }
     }
-    return win;
+    return 0;
 }
 // function result() {
 //     if (xArray[0][0]==xArray[0][1] && xArray[0][0] == xArray[0][2]) {
